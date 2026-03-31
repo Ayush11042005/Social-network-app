@@ -102,7 +102,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ con
         mediaUrl: mediaUrl || '',
         mediaType: mediaType || '',
       }
-    )) as any[];
+    )) as Record<string, unknown>[];
 
     const resultingMessage = writeResult[0] ? writeResult[0].msg as Record<string, unknown> : null;
     const sender = writeResult[0] ? writeResult[0].me as Record<string, unknown> : null;

@@ -11,7 +11,7 @@ cloudinary.config({
 
 export async function uploadFile(file: File): Promise<string> {
   try {
-    // If Cloudinary is configured, use it (required for Vercel/Production)
+    // If Cloudinary is configured, use it (required for Production)
     if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY) {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
@@ -27,7 +27,12 @@ export async function uploadFile(file: File): Promise<string> {
       });
     }
 
-    // Fallback to local storage (Dev only)
+    // DISALLOW local storage in production (it will crash Netlify/Vercel)
+    if (process.env.NODE_ENV === 'production' || process.env.NETLIFY) {
+      throw new Error('Cloud storage (Cloudinary) is NOT configured! Please add your Cloudinary credentials on the dashboard.');
+    }
+
+    // Fallback to local storage (LOCAL DEVELOPMENT ONLY)
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
@@ -47,7 +52,7 @@ export async function uploadFile(file: File): Promise<string> {
     return `/uploads/${filename}`;
   } catch (error) {
     console.error('File upload error:', error);
-    throw new Error('Failed to save file');
+    throw error;
   }
 }
 

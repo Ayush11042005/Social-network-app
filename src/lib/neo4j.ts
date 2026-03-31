@@ -4,9 +4,14 @@ let driver: Driver | null = null;
 
 function getDriver(): Driver {
   if (!driver) {
-    const uri = process.env.NEO4J_URI!;
-    const username = process.env.NEO4J_USERNAME!;
-    const password = process.env.NEO4J_PASSWORD!;
+    const uri = process.env.NEO4J_URI;
+    const username = process.env.NEO4J_USERNAME;
+    const password = process.env.NEO4J_PASSWORD;
+
+    if (!uri || !username || !password) {
+      console.error('CRITICAL: Neo4j environment variables are missing!');
+      throw new Error('Database connection failed: Missing credentials. Please check your environment variables.');
+    }
 
     driver = neo4j.driver(uri, neo4j.auth.basic(username, password), {
       maxConnectionPoolSize: 50,
