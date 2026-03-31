@@ -80,7 +80,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ con
     const messageId = uuidv4();
 
     // Create message and attach to conversation
-    const writeResult = await runWriteQuery<{ msg: Record<string, unknown>; me: Record<string, unknown> }>(
+    const writeResult = await runWriteQuery(
       `MATCH (me:User {id: $userId})
        MATCH (c:Conversation {id: $conversationId})
        CREATE (msg:Message {
