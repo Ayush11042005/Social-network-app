@@ -80,7 +80,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ con
     const messageId = uuidv4();
 
     // Create message and attach to conversation
-    const writeResult = (await runWriteQuery(
+    const writeResult = await runWriteQuery(
       `MATCH (me:User {id: $userId})
        MATCH (c:Conversation {id: $conversationId})
        CREATE (msg:Message {
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ con
         mediaUrl: mediaUrl || '',
         mediaType: mediaType || '',
       }
-    )) as Record<string, unknown>[];
+    );
 
     const resultingMessage = writeResult[0] ? writeResult[0].msg as Record<string, unknown> : null;
     const sender = writeResult[0] ? writeResult[0].me as Record<string, unknown> : null;
