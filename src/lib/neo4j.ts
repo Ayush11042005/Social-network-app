@@ -55,13 +55,23 @@ export async function runSingleQuery<T = Record<string, unknown>>(
   return results.length > 0 ? results[0] : null;
 }
 
-export async function runWriteQuery(
+export async function runWriteQuery<T = Record<string, unknown>>(
   cypher: string,
   params: Record<string, unknown> = {}
-): Promise<void> {
+): Promise<T[]> {
   const session = getSession();
   try {
-    await session.run(cypher, params);
+    const result = await session.run(cypher, params);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return result.records.map((record: any) => {
+      const obj: Record<string, unknown> = {};
+      const keys = record.keys as string[];
+      keys.forEach((key: string) => {
+        const value = record.get(key);
+        obj[key] = value?.properties ? { ...value.properties, _labels: value.labels } : value;
+      });
+      return obj as T;
+    }) as T[];
   } catch (error) {
     console.error('Neo4j write error:', error);
     throw error;
